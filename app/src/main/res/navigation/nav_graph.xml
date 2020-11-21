@@ -3,11 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/shoppingListsFragment">
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.example.ishopping.WelcomeFragment"
+        android:name="com.example.ishopping.Ui.WelcomeFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_first"/>
+    <fragment
+        android:id="@+id/shoppingListsFragment"
+        android:name="com.example.ishopping.Ui.ShoppingListsFragment"
+        android:label="shopping_lists_fragment"
+        tools:layout="@layout/shopping_lists_fragment" >
+        <action
+            android:id="@+id/action_shoppingListsFragment_to_singleShoppingListFragment"
+            app:destination="@id/singleShoppingListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/singleShoppingListFragment"
+        android:name="com.example.ishopping.Ui.SingleShoppingListFragment"
+        android:label="single_shopping_list_fragment"
+        tools:layout="@layout/single_shopping_list_fragment" />
 </navigation>

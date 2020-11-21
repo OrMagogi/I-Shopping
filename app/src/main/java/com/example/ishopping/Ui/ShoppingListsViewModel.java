@@ -1,4 +1,4 @@
-package com.example.ishopping.ui.shoppinglists;
+package com.example.ishopping.Ui;
 
 import androidx.lifecycle.ViewModel;
 

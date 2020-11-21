@@ -1,4 +1,4 @@
-package com.example.ishopping;
+package com.example.ishopping.Data;
 
 import android.media.Image;
 

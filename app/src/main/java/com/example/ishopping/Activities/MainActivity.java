@@ -1,7 +1,8 @@
-package com.example.ishopping;
+package com.example.ishopping.Activities;
 
 import android.os.Bundle;
 
+import com.example.ishopping.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 

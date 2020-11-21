@@ -1,4 +1,4 @@
-package com.example.ishopping;
+package com.example.ishopping.Ui;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
+
+import com.example.ishopping.Activities.ShoppingActivity;
+import com.example.ishopping.R;
 
 public class WelcomeFragment extends Fragment {
 

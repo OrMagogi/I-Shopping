@@ -1,12 +1,15 @@
-package com.example.ishopping;
+package com.example.ishopping.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import com.example.ishopping.ui.shoppinglists.ShoppingListsFragment;
+import com.example.ishopping.R;
+import com.example.ishopping.Ui.ShoppingListsFragment;
 
 public class ShoppingActivity extends AppCompatActivity {
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
