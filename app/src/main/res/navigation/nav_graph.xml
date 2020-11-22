@@ -23,5 +23,14 @@
         android:id="@+id/singleShoppingListFragment"
         android:name="com.example.ishopping.Ui.SingleShoppingListFragment"
         android:label="single_shopping_list_fragment"
-        tools:layout="@layout/single_shopping_list_fragment" />
+        tools:layout="@layout/single_shopping_list_fragment" >
+        <action
+            android:id="@+id/action_singleShoppingListFragment_to_addNewProductFragment"
+            app:destination="@id/addNewProductFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addNewProductFragment"
+        android:name="com.example.ishopping.Ui.AddNewProductFragment"
+        android:label="fragment_add_new_product"
+        tools:layout="@layout/fragment_add_new_product" />
 </navigation>

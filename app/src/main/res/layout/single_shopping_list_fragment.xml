@@ -16,6 +16,13 @@
         android:text="רשימת מוצרים"
         android:textSize="24dp" />
 
+    <ImageButton
+        android:id="@+id/add_new_product_button"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:src="@drawable/ic_add_new_product" />
+
     <com.toptoche.searchablespinnerlibrary.SearchableSpinner
         android:id="@+id/search_product_spinner"
         android:layout_width="match_parent"
