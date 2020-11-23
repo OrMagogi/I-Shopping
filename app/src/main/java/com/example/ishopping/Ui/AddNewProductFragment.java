@@ -12,17 +12,29 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.Toast;
 
+import com.example.ishopping.Data.ConstantValues;
+import com.example.ishopping.Data.Product;
 import com.example.ishopping.R;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AddNewProductFragment extends Fragment {
 
 
-    private EditText newProductName;
-    private Spinner newProductCategory;
+    private EditText newProductNameEdittext;
+    private String newProductName,newProductCategory;
+    private Spinner newProductCategorySpinner;
     private CircleImageView saveNewProductButton;
+    private ArrayList<String> categories,existingProducts;
+    private FirebaseDatabase firebaseDatabase;
+    private static DatabaseReference productsRef;
+    private Product newProduct;
 
 
     public static AddNewProductFragment newInstance(String param1, String param2) {
@@ -49,8 +61,45 @@ public class AddNewProductFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        categories= new ArrayList<String>();
+        existingProducts= new ArrayList<String>();
         saveNewProductButton= view.findViewById(R.id.add_new_product_completed_button);
-        newProductName= view.findViewById(R.id.new_product_name_edittext);
-        newProductCategory = view.findViewById(R.id.new_product_category_spinner);
+        newProductNameEdittext= view.findViewById(R.id.new_product_name_edittext);
+        newProductCategorySpinner = view.findViewById(R.id.new_product_category_spinner);
+
+        firebaseDatabase= FirebaseDatabase.getInstance();
+        productsRef= firebaseDatabase.getReference().child(ConstantValues.products);
+
+        setListeners();
+    }
+
+    void setListeners(){
+        AddNewProductFragment.ClickListener clickListener=new AddNewProductFragment.ClickListener();
+        saveNewProductButton.setOnClickListener(clickListener);
+    }
+
+    private class ClickListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+            newProductName=newProductNameEdittext.getText().toString().trim();
+            if(checkInput()){
+
+                switch (v.getId()){
+                    case R.id.add_new_product_completed_button:
+                        // TODO save in Database
+                        break;
+                }
+            }
+
+        }
+
+        private boolean checkInput() {
+            if(newProductName.equals("")||existingProducts.contains(newProductName)){
+                Toast.makeText(getActivity(), "שם לא תקין או המוצר קיים כבר", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            return true;
+        }
     }
 }
