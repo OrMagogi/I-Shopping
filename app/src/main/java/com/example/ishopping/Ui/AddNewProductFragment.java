@@ -11,12 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.ishopping.Data.ConstantValues;
 import com.example.ishopping.Data.Product;
 import com.example.ishopping.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -35,7 +38,6 @@ public class AddNewProductFragment extends Fragment {
     private FirebaseDatabase firebaseDatabase;
     private static DatabaseReference productsRef;
     private Product newProduct;
-
 
     public static AddNewProductFragment newInstance(String param1, String param2) {
         AddNewProductFragment fragment = new AddNewProductFragment();
@@ -62,11 +64,17 @@ public class AddNewProductFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         categories= new ArrayList<String>();
+        // TODO change categories to DB
+        categories.add("מוצרי חלב");
+        categories.add("ירקות ופירות");
+        categories.add("בשר");
+
+        //
         existingProducts= new ArrayList<String>();
         saveNewProductButton= view.findViewById(R.id.add_new_product_completed_button);
         newProductNameEdittext= view.findViewById(R.id.new_product_name_edittext);
         newProductCategorySpinner = view.findViewById(R.id.new_product_category_spinner);
-
+        // TODO add categories spinner sdapter
         firebaseDatabase= FirebaseDatabase.getInstance();
         productsRef= firebaseDatabase.getReference().child(ConstantValues.products);
 
@@ -83,11 +91,13 @@ public class AddNewProductFragment extends Fragment {
         @Override
         public void onClick(View v) {
             newProductName=newProductNameEdittext.getText().toString().trim();
+            newProductCategory= newProductCategorySpinner.getSelectedItem().toString().trim();
             if(checkInput()){
 
                 switch (v.getId()){
                     case R.id.add_new_product_completed_button:
-                        // TODO save in Database
+                        Product newProduct= new Product(newProductName,null,newProductCategory,"",null);
+                        saveNewProductInDb(newProduct);
                         break;
                 }
             }
@@ -95,11 +105,30 @@ public class AddNewProductFragment extends Fragment {
         }
 
         private boolean checkInput() {
-            if(newProductName.equals("")||existingProducts.contains(newProductName)){
-                Toast.makeText(getActivity(), "שם לא תקין או המוצר קיים כבר", Toast.LENGTH_SHORT).show();
-                return false;
+            boolean isValid=true;
+            if(newProductName.equals("")){
+                Toast.makeText(getActivity(), "שם המוצר לא תקין", Toast.LENGTH_SHORT).show();
+                isValid=false;
             }
-            return true;
+            else if(newProductCategory.equals("")){
+                Toast.makeText(getActivity(), "בחר קטגוריה", Toast.LENGTH_SHORT).show();
+                isValid=false;
+            }
+            else if(existingProducts.contains(newProductName)){
+                Toast.makeText(getActivity(), "המוצר קיים כבר במערכת", Toast.LENGTH_SHORT).show();
+                isValid=false;
+            }
+            return isValid;
         }
+    }
+
+    void saveNewProductInDb(Product newProduct){
+        productsRef.setValue(newProduct).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(getActivity(), "המוצר נוסף בהצלחה", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 }

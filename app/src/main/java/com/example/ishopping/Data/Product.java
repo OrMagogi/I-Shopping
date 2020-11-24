@@ -4,7 +4,6 @@ import android.media.Image;
 
 public class Product {
 
-    private String productId;
     private String productName;
     private String productQuantity;
     private String productCategory;
@@ -12,8 +11,7 @@ public class Product {
     private String productImage;
 
 
-    public Product(String productId, String productName, String productQuantity, String productCategory, String productDescription, String productImage) {
-        this.productId = productId;
+    public Product(String productName, String productQuantity, String productCategory, String productDescription, String productImage) {
         this.productName = productName;
         this.productQuantity = productQuantity;
         this.productCategory = productCategory;
@@ -21,13 +19,6 @@ public class Product {
         this.productImage = productImage;
     }
 
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
 
     public String getProductName() {
         return productName;
