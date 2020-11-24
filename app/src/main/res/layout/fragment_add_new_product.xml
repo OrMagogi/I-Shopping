@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:text="שם המוצר:"
-            android:textSize="20dp" />
+            android:textSize="25sp" />
 
         <EditText
             android:id="@+id/new_product_name_edittext"
@@ -39,7 +39,7 @@
             android:ems="10"
             android:hint="הכנס כאן"
             android:inputType="textPersonName"
-            android:textSize="20dp" />
+            android:textSize="25sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:text="קטגוריה:"
-            android:textSize="20dp" />
+            android:textSize="25sp" />
 
         <Spinner
             android:id="@+id/new_product_category_spinner"

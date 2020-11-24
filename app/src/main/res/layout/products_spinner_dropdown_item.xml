@@ -13,7 +13,7 @@
         <TextView
             android:id="@+id/product_name_in_spinner"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="35sp"
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:text="TextView"
@@ -21,8 +21,8 @@
 
         <ImageView
             android:id="@+id/product_image_in_spinner"
-            android:layout_width="35dp"
+            android:layout_width="15sp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
     </LinearLayout>
 </LinearLayout>
