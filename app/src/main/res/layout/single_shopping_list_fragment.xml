@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="רשימת מוצרים"
-        android:textSize="24dp" />
+        android:textSize="15dp" />
 
     <ImageButton
         android:id="@+id/add_new_product_button"

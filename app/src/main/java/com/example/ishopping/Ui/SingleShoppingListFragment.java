@@ -13,24 +13,29 @@ import androidx.navigation.Navigation;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.ishopping.Activities.ShoppingActivity;
+import com.example.ishopping.Data.ShoppingList;
 import com.example.ishopping.R;
-
-import java.util.ArrayList;
-
-import de.hdodenhof.circleimageview.CircleImageView;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SingleShoppingListFragment extends Fragment {
 
     private ShoppingListViewModel mViewModel;
-    private ArrayList<String> previousProducts;
     private Spinner searchProductsSpinner;
     private NavController navController;
     private ImageButton addNewProductButton;
+    private FirebaseDatabase firebaseDatabase;
+    private static DatabaseReference productsRef;
+    private String selectedProductName;
+    private ShoppingList shoppingList;
+    private TextView listHeadline;
 
     public static SingleShoppingListFragment newInstance() {
         return new SingleShoppingListFragment();
@@ -54,17 +59,19 @@ public class SingleShoppingListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
         addNewProductButton= view.findViewById(R.id.add_new_product_button);
+        listHeadline= view.findViewById(R.id.product_list_headline);
         searchProductsSpinner= view.findViewById(R.id.search_product_spinner);
-        previousProducts=new ArrayList<String>();
-        previousProducts.add("milk");
-        previousProducts.add("bread");
-        previousProducts.add("butter");
-        searchProductsSpinner.setAdapter(new ArrayAdapter<>(getActivity(),R.layout.products_spinner_dropdown_item,previousProducts));
+        searchProductsSpinner.setAdapter(new ArrayAdapter<>(getActivity(),R.layout.products_spinner_dropdown_item,ShoppingListsFragment.getExistingProducts()));
+        firebaseDatabase= FirebaseDatabase.getInstance();
+        shoppingList=new ShoppingList();
+        listHeadline.setText(listHeadline.getText()+" - "+shoppingList.getDate());
         setListeners();
     }
 
     private void setListeners(){
+        ItemSelectionListener itemSelectionListener=new ItemSelectionListener();
         SingleShoppingListFragment.ClickListener clickListener=new SingleShoppingListFragment.ClickListener();
+        searchProductsSpinner.setOnItemSelectedListener(itemSelectionListener);
         addNewProductButton.setOnClickListener(clickListener);
     }
 
@@ -79,4 +86,19 @@ public class SingleShoppingListFragment extends Fragment {
 
         }
     }
+
+    private class ItemSelectionListener implements AdapterView.OnItemSelectedListener{
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            selectedProductName= parent.getSelectedItem().toString();
+            Toast.makeText(getActivity(), selectedProductName, Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    }
+
 }

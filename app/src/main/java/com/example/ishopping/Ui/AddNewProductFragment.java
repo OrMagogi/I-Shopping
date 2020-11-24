@@ -19,10 +19,14 @@ import com.example.ishopping.Data.Product;
 import com.example.ishopping.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -35,11 +39,9 @@ public class AddNewProductFragment extends Fragment {
     private Spinner newProductCategorySpinner;
     private CircleImageView saveNewProductButton;
     private ArrayList<Category> categories;
-    private ArrayList<String> existingProducts;
     private CategoryAdapter categoryAdapter;
     private FirebaseDatabase firebaseDatabase;
     private static DatabaseReference productsRef;
-    private Product newProduct;
 
     public static AddNewProductFragment newInstance(String param1, String param2) {
         AddNewProductFragment fragment = new AddNewProductFragment();
@@ -72,13 +74,10 @@ public class AddNewProductFragment extends Fragment {
         newProductCategorySpinner.setAdapter(categoryAdapter);
 
         //
-        existingProducts= new ArrayList<String>();
         saveNewProductButton= view.findViewById(R.id.add_new_product_completed_button);
         newProductNameEdittext= view.findViewById(R.id.new_product_name_edittext);
-        // TODO add categories spinner sdapter
         firebaseDatabase= FirebaseDatabase.getInstance();
         productsRef= firebaseDatabase.getReference().child(ConstantValues.products);
-
         setListeners();
     }
 
@@ -116,7 +115,7 @@ public class AddNewProductFragment extends Fragment {
                 Toast.makeText(getActivity(), "בחר קטגוריה", Toast.LENGTH_SHORT).show();
                 isValid=false;
             }
-            else if(existingProducts.contains(newProductName)){
+            else if(ShoppingListsFragment.getExistingProducts().contains(newProductName)){
                 Toast.makeText(getActivity(), "המוצר קיים כבר במערכת", Toast.LENGTH_SHORT).show();
                 isValid=false;
             }
@@ -125,7 +124,7 @@ public class AddNewProductFragment extends Fragment {
     }
 
     void saveNewProductInDb(Product newProduct){
-        productsRef.child(newProductCategoryName).child(newProductName).setValue(newProduct).addOnCompleteListener(new OnCompleteListener<Void>() {
+        productsRef.child(newProductName).setValue(newProduct).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Toast.makeText(getActivity(), "המוצר נוסף בהצלחה", Toast.LENGTH_SHORT).show();
@@ -142,4 +141,7 @@ public class AddNewProductFragment extends Fragment {
         categories.add(new Category("בשר",R.drawable.meat));
         categories.add(new Category("מוצרי חלב",R.drawable.milk));
     }
+
+
+
 }

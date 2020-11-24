@@ -40,7 +40,7 @@ public class CategoryAdapter extends ArrayAdapter<Category> {
 
     private View initView(int position, View convertView, @NonNull ViewGroup parent){
         if(convertView==null){
-            convertView= LayoutInflater.from(getContext()).inflate(R.layout.products_spinner_dropdown_item,parent,false);
+            convertView= LayoutInflater.from(getContext()).inflate(R.layout.categories_spinner_dropdown_item,parent,false);
         }
         categoryInSpinnerImage = convertView.findViewById(R.id.product_image_in_spinner);
         categoryInSpinnerName = convertView.findViewById(R.id.product_name_in_spinner);
