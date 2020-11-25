@@ -34,6 +34,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ShoppingListsFragment extends Fragment {
 
@@ -47,7 +49,7 @@ public class ShoppingListsFragment extends Fragment {
     private static DatabaseReference productsRef,shoppingListsRef;
     private Product productFromDb;
     private ShoppingList shoppingListFromDb,newShoppingList;
-    private static ArrayList<String> existingProducts;
+    private static HashMap<String,String> existingProducts;
     private FirebaseRecyclerAdapter<ShoppingList, ShoppingListsFragment.ShoppingListsViewHolder> firebaseRecyclerAdapter;
 
 
@@ -81,7 +83,7 @@ public class ShoppingListsFragment extends Fragment {
         firebaseDatabase= FirebaseDatabase.getInstance();
         existingShoppingListsValidation = new ArrayList<String>();
         existingShoppingListsDates = new ArrayList<String>();
-        existingProducts= new ArrayList<String>();
+        existingProducts= new HashMap<String,String>();
         shoppingListsRef = firebaseDatabase.getReference().child(ConstantValues.shoppingLists);
         productsRef= firebaseDatabase.getReference().child(ConstantValues.products);
 
@@ -103,23 +105,22 @@ public class ShoppingListsFragment extends Fragment {
     private class ClickListener implements View.OnClickListener{
         @Override
         public void onClick(View v) {
-            switch (v.getId()){
+            switch (v.getId()) {
                 case R.id.add_new_list_button:
-                    if(existingShoppingListsValidation.contains("true")){
+                    if (existingShoppingListsValidation.contains("true")) {
                         Toast.makeText(getActivity(), "יש קניה לא סגורה", Toast.LENGTH_SHORT).show();
-                    }
-                    else{
-                        newShoppingList= new ShoppingList();
+                    } else {
+                        newShoppingList = new ShoppingList();
+                        SingleShoppingListFragment.setShoppingList(newShoppingList);
                         shoppingListsRef.child(newShoppingList.getDate()).setValue(newShoppingList);
                         navController.navigate(R.id.action_shoppingListsFragment_to_singleShoppingListFragment);
                     }
                     break;
             }
-
         }
     }
 
-    public static ArrayList<String> getExistingProducts() {
+    public static HashMap<String,String> getExistingProducts() {
         return existingProducts;
     }
 
@@ -129,7 +130,7 @@ public class ShoppingListsFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot data: snapshot.getChildren()){
                     productFromDb = (Product) data.getValue(Product.class);
-                    existingProducts.add(productFromDb.getProductName());
+                    existingProducts.put(productFromDb.getProductName(),productFromDb.getProductCategory());
                 }
             }
 
@@ -174,7 +175,7 @@ public class ShoppingListsFragment extends Fragment {
             }
 
             @Override
-            protected void onBindViewHolder(@NonNull ShoppingListsViewHolder holder, int position, @NonNull ShoppingList model) {
+            protected void onBindViewHolder(@NonNull final ShoppingListsViewHolder holder, int position, @NonNull final ShoppingList model) {
                 holder.shoppingListDate.setText(model.getDate());
                 String status;
                 if (model.getIsOpen().equals("true")) {
@@ -183,7 +184,13 @@ public class ShoppingListsFragment extends Fragment {
                     status = "סגור";
                 }
                 holder.shoppingListStatus.setText(status);
-                //TODO add listener
+                holder.shoppingListLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SingleShoppingListFragment.setShoppingList(model);
+                        navController.navigate(R.id.action_shoppingListsFragment_to_singleShoppingListFragment);
+                    }
+                });
             }
         };
 
@@ -195,11 +202,13 @@ public class ShoppingListsFragment extends Fragment {
     public static class ShoppingListsViewHolder extends RecyclerView.ViewHolder{
         TextView shoppingListDate;
         TextView shoppingListStatus;
+        LinearLayout shoppingListLayout;
 
         public ShoppingListsViewHolder(@NonNull View itemView) {
             super(itemView);
             shoppingListDate = itemView.findViewById(R.id.shopping_list_in_recycler_date);
             shoppingListStatus = itemView.findViewById(R.id.shopping_list_in_recycler_status);
+            shoppingListLayout = itemView.findViewById(R.id.shopping_list_in_recycler_layout);
 
         }
     }

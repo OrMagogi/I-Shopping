@@ -5,7 +5,6 @@ import java.util.Calendar;
 
 public class ShoppingList {
 
-    private String shoppingListId;
     private ArrayList<Product> productList;
     private String shoppingListDate;
     private String shoppingListCost;
@@ -18,13 +17,6 @@ public class ShoppingList {
         this.isOpen="true";
     }
 
-    public String getShoppingListId() {
-        return shoppingListId;
-    }
-
-    public void setShoppingListId(String shoppingListId) {
-        this.shoppingListId = shoppingListId;
-    }
 
     public ArrayList<Product> getProductList() {
         return productList;

@@ -115,7 +115,7 @@ public class AddNewProductFragment extends Fragment {
                 Toast.makeText(getActivity(), "בחר קטגוריה", Toast.LENGTH_SHORT).show();
                 isValid=false;
             }
-            else if(ShoppingListsFragment.getExistingProducts().contains(newProductName)){
+            else if(ShoppingListsFragment.getExistingProducts().containsKey(newProductName)){
                 Toast.makeText(getActivity(), "המוצר קיים כבר במערכת", Toast.LENGTH_SHORT).show();
                 isValid=false;
             }

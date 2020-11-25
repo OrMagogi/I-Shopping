@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Shopping Lists"
+        android:text="קניות"
         android:textSize="24dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
