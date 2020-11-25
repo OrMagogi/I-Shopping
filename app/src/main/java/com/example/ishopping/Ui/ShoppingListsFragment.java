@@ -9,16 +9,22 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ishopping.Data.ConstantValues;
 import com.example.ishopping.Data.Product;
 import com.example.ishopping.Data.ShoppingList;
 import com.example.ishopping.R;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,6 +40,7 @@ public class ShoppingListsFragment extends Fragment {
     private ShoppingListsViewModel mViewModel;
     private FloatingActionButton addNewListButton;
     private NavController navController;
+    private static RecyclerView shoppingListsRecyclerView;
     private ArrayList<String> existingShoppingListsValidation;
     private ArrayList<String> existingShoppingListsDates;
     private FirebaseDatabase firebaseDatabase;
@@ -41,6 +48,8 @@ public class ShoppingListsFragment extends Fragment {
     private Product productFromDb;
     private ShoppingList shoppingListFromDb,newShoppingList;
     private static ArrayList<String> existingProducts;
+    private FirebaseRecyclerAdapter<ShoppingList, ShoppingListsFragment.ShoppingListsViewHolder> firebaseRecyclerAdapter;
+
 
     //
 
@@ -67,12 +76,20 @@ public class ShoppingListsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         addNewListButton= view.findViewById(R.id.add_new_list_button);
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+        shoppingListsRecyclerView = view.findViewById(R.id.shopping_lists_recycler);
+        shoppingListsRecyclerView.setHasFixedSize(true);
         firebaseDatabase= FirebaseDatabase.getInstance();
         existingShoppingListsValidation = new ArrayList<String>();
         existingShoppingListsDates = new ArrayList<String>();
         existingProducts= new ArrayList<String>();
         shoppingListsRef = firebaseDatabase.getReference().child(ConstantValues.shoppingLists);
         productsRef= firebaseDatabase.getReference().child(ConstantValues.products);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
+        shoppingListsRecyclerView.setLayoutManager(layoutManager);
+        //showShoppingLists();
         setProductsListener();
         setShoppingListsListener();
         setClickListeners();
@@ -92,7 +109,6 @@ public class ShoppingListsFragment extends Fragment {
                         Toast.makeText(getActivity(), "יש קניה לא סגורה", Toast.LENGTH_SHORT).show();
                     }
                     else{
-                        // TODO save new list
                         newShoppingList= new ShoppingList();
                         shoppingListsRef.child(newShoppingList.getDate()).setValue(newShoppingList);
                         navController.navigate(R.id.action_shoppingListsFragment_to_singleShoppingListFragment);
@@ -133,6 +149,7 @@ public class ShoppingListsFragment extends Fragment {
                     existingShoppingListsValidation.add(shoppingListFromDb.getIsOpen());
                     existingShoppingListsDates.add(shoppingListFromDb.getDate());
                 }
+                showShoppingLists();
             }
 
             @Override
@@ -140,5 +157,50 @@ public class ShoppingListsFragment extends Fragment {
 
             }
         });
+    }
+
+    public void showShoppingLists() {
+        FirebaseRecyclerOptions<ShoppingList> options = new FirebaseRecyclerOptions
+                .Builder<ShoppingList>()
+                .setQuery(shoppingListsRef, ShoppingList.class)
+                .build();
+        firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<ShoppingList, ShoppingListsViewHolder>(options) {
+            @NonNull
+            @Override
+            public ShoppingListsFragment.ShoppingListsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.shopping_list_in_recycler, parent, false);
+                ShoppingListsFragment.ShoppingListsViewHolder viewHolder = new ShoppingListsFragment.ShoppingListsViewHolder(view);
+                return viewHolder;
+            }
+
+            @Override
+            protected void onBindViewHolder(@NonNull ShoppingListsViewHolder holder, int position, @NonNull ShoppingList model) {
+                holder.shoppingListDate.setText(model.getDate());
+                String status;
+                if (model.getIsOpen().equals("true")) {
+                    status = "פתוח";
+                } else {
+                    status = "סגור";
+                }
+                holder.shoppingListStatus.setText(status);
+                //TODO add listener
+            }
+        };
+
+        RecyclerView newShoppingListsRecyclerView = shoppingListsRecyclerView;
+        newShoppingListsRecyclerView.setAdapter(firebaseRecyclerAdapter);
+        firebaseRecyclerAdapter.startListening();
+    }
+
+    public static class ShoppingListsViewHolder extends RecyclerView.ViewHolder{
+        TextView shoppingListDate;
+        TextView shoppingListStatus;
+
+        public ShoppingListsViewHolder(@NonNull View itemView) {
+            super(itemView);
+            shoppingListDate = itemView.findViewById(R.id.shopping_list_in_recycler_date);
+            shoppingListStatus = itemView.findViewById(R.id.shopping_list_in_recycler_status);
+
+        }
     }
 }

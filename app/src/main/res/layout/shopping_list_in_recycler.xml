@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/shopping_list_in_recycler_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="תאריך"
-        android:textSize="20dp" />
+        android:textSize="25dp" />
 
     <TextView
         android:id="@+id/shopping_list_in_recycler_status"
@@ -17,5 +18,5 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="סטטוס"
-        android:textSize="20dp" />
+        android:textSize="25dp" />
 </LinearLayout>
