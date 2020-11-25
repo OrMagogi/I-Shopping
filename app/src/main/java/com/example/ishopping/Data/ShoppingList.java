@@ -9,11 +9,13 @@ public class ShoppingList {
     private ArrayList<Product> productList;
     private String shoppingListDate;
     private String shoppingListCost;
+    private String isOpen;
 
     public ShoppingList() {
         this.productList = new ArrayList<Product>();
-        this.shoppingListDate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
+        this.shoppingListDate = java.text.DateFormat.getDateInstance().format(Calendar.getInstance().getTime());
         this.shoppingListCost = "";
+        this.isOpen="true";
     }
 
     public String getShoppingListId() {
@@ -46,5 +48,13 @@ public class ShoppingList {
 
     public void setCost(String cost) {
         this.shoppingListCost = cost;
+    }
+
+    public String getIsOpen() {
+        return isOpen;
+    }
+
+    public void setIsOpen(String isOpen) {
+        this.isOpen = isOpen;
     }
 }
