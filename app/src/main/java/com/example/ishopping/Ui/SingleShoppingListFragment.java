@@ -2,6 +2,8 @@ package com.example.ishopping.Ui;
 
 import androidx.lifecycle.ViewModelProviders;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,13 +11,19 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +32,8 @@ import com.example.ishopping.Data.ConstantValues;
 import com.example.ishopping.Data.Product;
 import com.example.ishopping.Data.ShoppingList;
 import com.example.ishopping.R;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,13 +52,19 @@ public class SingleShoppingListFragment extends Fragment {
     private Spinner searchProductsSpinner;
     private NavController navController;
     private ImageButton addNewProductButton;
+    private Button closeShoppingListButton;
     private FirebaseDatabase firebaseDatabase;
-    private DatabaseReference productsRef;
+    private DatabaseReference shoppingListRef,productsRef;
     private String selectedProductName;
     private HashMap<String,String> existingProducts;
     private static ShoppingList shoppingList;
     private ArrayList<Product> currentProductsList;
+    private ArrayList<String> currentProductsNamesList;
+    private RecyclerView productsRecycler;
+    private int index;
     private TextView listHeadline;
+    private FirebaseRecyclerAdapter<Product, SingleShoppingListFragment.SingleShoppingListViewHolder> firebaseRecyclerAdapter;
+
 
     public static SingleShoppingListFragment newInstance() {
         return new SingleShoppingListFragment();
@@ -72,20 +88,32 @@ public class SingleShoppingListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         existingProducts = ShoppingListsFragment.getExistingProducts();
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+        productsRecycler= view.findViewById(R.id.product_list_recycler);
+        closeShoppingListButton= view.findViewById(R.id.closeShoppingListButton);
         addNewProductButton= view.findViewById(R.id.add_new_product_button);
         listHeadline= view.findViewById(R.id.product_list_headline);
         searchProductsSpinner= view.findViewById(R.id.search_product_spinner);
         searchProductsSpinner.setAdapter(new ArrayAdapter<>(getActivity(),R.layout.products_spinner_dropdown_item,ShoppingListsFragment.getExistingProducts().keySet().toArray()));
         firebaseDatabase= FirebaseDatabase.getInstance();
-        productsRef = firebaseDatabase.getReference().child(ConstantValues.shoppingLists).child(shoppingList.getDate()).child("productList");
+        shoppingListRef=firebaseDatabase.getReference().child(ConstantValues.shoppingLists).child(shoppingList.getDate());
+        productsRef = shoppingListRef.child("productList");
         listHeadline.setText(listHeadline.getText()+" - "+shoppingList.getDate());
         currentProductsList=new ArrayList<Product>();
+        currentProductsNamesList=new ArrayList<String>();
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
+        productsRecycler.setLayoutManager(layoutManager);
+        index=0;
         productsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot data: snapshot.getChildren()){
                     currentProductsList.add((Product) data.getValue(Product.class));
+                    currentProductsNamesList.add(currentProductsList.get(index).getProductName());
+                    index++;
                 }
+                showProductsList();
             }
 
             @Override
@@ -93,13 +121,20 @@ public class SingleShoppingListFragment extends Fragment {
 
             }
         });
-        setListeners();
+        if(shoppingList.getIsOpen().equals("true")){
+            setListeners();
+        } else{
+            closeShoppingListButton.setText("הקניה סגורה");
+            closeShoppingListButton.setClickable(false);
+            searchProductsSpinner.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void setListeners(){
         ItemSelectionListener itemSelectionListener=new ItemSelectionListener();
         SingleShoppingListFragment.ClickListener clickListener=new SingleShoppingListFragment.ClickListener();
         searchProductsSpinner.setOnItemSelectedListener(itemSelectionListener);
+        closeShoppingListButton.setOnClickListener(clickListener);
         addNewProductButton.setOnClickListener(clickListener);
     }
 
@@ -109,6 +144,9 @@ public class SingleShoppingListFragment extends Fragment {
             switch (v.getId()){
                 case R.id.add_new_product_button:
                     navController.navigate(R.id.action_singleShoppingListFragment_to_addNewProductFragment);
+                    break;
+                case R.id.closeShoppingListButton:
+                    createAlertDialog("האם אתה בטוח שאתה רוצה לסגור את הקניה ?", ConstantValues.closeShoppingListAction,null);
                     break;
             }
 
@@ -120,10 +158,15 @@ public class SingleShoppingListFragment extends Fragment {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             selectedProductName= parent.getSelectedItem().toString();
-            Product newProduct=new Product(selectedProductName,"1",existingProducts.get(selectedProductName),null,null);
-            currentProductsList.add(newProduct);
-
-            //Toast.makeText(getActivity(), selectedProductName +" "+ ShoppingListsFragment.getExistingProducts().get(selectedProductName), Toast.LENGTH_SHORT).show();
+            if(currentProductsNamesList.contains(selectedProductName)){
+                Toast.makeText(getActivity(), "המוצר כבר קיים ברשימה", Toast.LENGTH_SHORT).show();
+            } else{
+                Product newProduct=new Product(selectedProductName,"1",existingProducts.get(selectedProductName),null,null,"false");
+                //currentProductsList.add(newProduct);
+                currentProductsNamesList.add(selectedProductName);
+                //productsRef.setValue(currentProductsList);
+                productsRef.child(selectedProductName).setValue(newProduct);
+            }
         }
 
         @Override
@@ -145,12 +188,97 @@ public class SingleShoppingListFragment extends Fragment {
     }
 
     private void showProductsList(){
-
+        FirebaseRecyclerOptions<Product> options = new FirebaseRecyclerOptions
+                .Builder<Product>()
+                .setQuery(productsRef, Product.class)
+                .build();
+        firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Product, SingleShoppingListFragment.SingleShoppingListViewHolder>(options) {
+            @NonNull
+            @Override
+            public SingleShoppingListFragment.SingleShoppingListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.product_in_recycler, parent, false);
+                SingleShoppingListFragment.SingleShoppingListViewHolder viewHolder = new SingleShoppingListFragment.SingleShoppingListViewHolder(view);
+                return viewHolder;
+            }
+            @Override
+            protected void onBindViewHolder(@NonNull final SingleShoppingListFragment.SingleShoppingListViewHolder holder, int position, @NonNull final Product model) {
+                holder.productName.setText(model.getProductName());
+                holder.productCheckbox.setChecked(Boolean.parseBoolean(model.getIsChecked()));
+                if(shoppingList.getIsOpen().equals("false")){
+                    holder.productName.setLongClickable(false);
+                    holder.productCheckbox.setClickable(false);
+                } else{
+                    holder.productCheckbox.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String newIsChecked = "false";
+                            if(model.getIsChecked().equals("false")){
+                                newIsChecked="true";
+                            }
+                            productsRef.child(model.getProductName()).child(ConstantValues.isChecked).setValue(newIsChecked);
+                        }
+                    });
+                    holder.productName.setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(View v) {
+                            return createAlertDialog("להסיר מהרשימה את המוצר: "+ model.getProductName()+ "?",ConstantValues.removeProductAction,model);
+                        }
+                    });
+                }
+            }
+        };
+        RecyclerView shoppingListRecyclerView = productsRecycler;
+        shoppingListRecyclerView.setAdapter(firebaseRecyclerAdapter);
+        firebaseRecyclerAdapter.startListening();
     }
 
-    @Override
+    public static class SingleShoppingListViewHolder extends RecyclerView.ViewHolder{
+        TextView productName;
+        CheckBox productCheckbox;
+
+        public SingleShoppingListViewHolder(@NonNull View itemView) {
+            super(itemView);
+            productName = itemView.findViewById(R.id.product_name_in_recycler);
+            productCheckbox = itemView.findViewById(R.id.product_check_in_recycler);
+        }
+    }
+
+    public boolean createAlertDialog(String message, final String action, final Product model){
+        AlertDialog.Builder builder=new AlertDialog.Builder(getContext());
+        builder.setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton("כן", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (action){
+                            case ConstantValues.removeProductAction:
+                                productsRef.child(model.getProductName()).removeValue();
+                                currentProductsNamesList.remove(model.getProductName());
+                                break;
+                            case ConstantValues.closeShoppingListAction:
+                                shoppingListRef.child(ConstantValues.isOpen).setValue("false");
+                                navController.navigate(R.id.action_singleShoppingListFragment_to_shoppingListsFragment);
+                                Toast.makeText(getActivity(), "הקניה נסגה בהצלחה", Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+
+                    }
+                })
+                .setNegativeButton("לא", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        return false;
+    }
+
+
+/*    @Override
     public void onDestroyView() {
         super.onDestroyView();
         productsRef.setValue(currentProductsList);
-    }
+    }*/
 }

@@ -2,27 +2,27 @@ package com.example.ishopping.Data;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
 public class ShoppingList {
 
-    private ArrayList<Product> productList;
+    private HashMap<String,Product> productList;
     private String shoppingListDate;
     private String shoppingListCost;
     private String isOpen;
 
     public ShoppingList() {
-        this.productList = new ArrayList<Product>();
+        this.productList = new HashMap<String,Product>();
         this.shoppingListDate = java.text.DateFormat.getDateInstance().format(Calendar.getInstance().getTime());
         this.shoppingListCost = "";
         this.isOpen="true";
     }
 
-
-    public ArrayList<Product> getProductList() {
+    public HashMap<String, Product> getProductList() {
         return productList;
     }
 
-    public void setProductList(ArrayList<Product> productList) {
+    public void setProductList(HashMap<String, Product> productList) {
         this.productList = productList;
     }
 

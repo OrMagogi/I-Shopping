@@ -9,17 +9,19 @@ public class Product {
     private String productCategory;
     private String productDescription;
     private String productImage;
+    private String isChecked;
 
     public Product(){
 
     }
 
-    public Product(String productName, String productQuantity, String productCategory, String productDescription, String productImage) {
+    public Product(String productName, String productQuantity, String productCategory, String productDescription, String productImage, String isChecked) {
         this.productName = productName;
         this.productQuantity = productQuantity;
         this.productCategory = productCategory;
         this.productDescription = productDescription;
         this.productImage = productImage;
+        this.isChecked = isChecked;
     }
 
 
@@ -61,5 +63,13 @@ public class Product {
 
     public void setProductImage(String productImage) {
         this.productImage = productImage;
+    }
+
+    public String getIsChecked() {
+        return isChecked;
+    }
+
+    public void setIsChecked(String isChecked) {
+        this.isChecked = isChecked;
     }
 }

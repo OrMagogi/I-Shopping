@@ -97,7 +97,7 @@ public class AddNewProductFragment extends Fragment {
 
                 switch (v.getId()){
                     case R.id.add_new_product_completed_button:
-                        Product newProduct= new Product(newProductName,null,newProductCategoryName,"",null);
+                        Product newProduct= new Product(newProductName,null,newProductCategoryName,"",null,null);
                         saveNewProductInDb(newProduct);
                         break;
                 }

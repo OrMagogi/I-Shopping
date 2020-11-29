@@ -27,6 +27,9 @@
         <action
             android:id="@+id/action_singleShoppingListFragment_to_addNewProductFragment"
             app:destination="@id/addNewProductFragment" />
+        <action
+            android:id="@+id/action_singleShoppingListFragment_to_shoppingListsFragment"
+            app:destination="@id/shoppingListsFragment" />
     </fragment>
     <fragment
         android:id="@+id/addNewProductFragment"
