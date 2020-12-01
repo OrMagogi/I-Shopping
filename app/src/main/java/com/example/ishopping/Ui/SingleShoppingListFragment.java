@@ -22,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -54,15 +55,17 @@ public class SingleShoppingListFragment extends Fragment {
     private ImageButton addNewProductButton;
     private Button closeShoppingListButton;
     private FirebaseDatabase firebaseDatabase;
-    private DatabaseReference shoppingListRef,productsRef;
-    private String selectedProductName;
+    private DatabaseReference shoppingListRef,productsRef,statisticsRef;
+    private String selectedProductName,costString;
     private HashMap<String,String> existingProducts;
     private static ShoppingList shoppingList;
     private ArrayList<Product> currentProductsList;
     private ArrayList<String> currentProductsNamesList;
     private RecyclerView productsRecycler;
     private int index;
-    private TextView listHeadline;
+    private LinearLayout listCostLayout;
+    private EditText listCostEdittext;
+    private TextView listHeadline,closedShoppingListCostTextview;
     private FirebaseRecyclerAdapter<Product, SingleShoppingListFragment.SingleShoppingListViewHolder> firebaseRecyclerAdapter;
 
 
@@ -88,18 +91,24 @@ public class SingleShoppingListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         existingProducts = ShoppingListsFragment.getExistingProducts();
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+        listCostLayout= view.findViewById(R.id.singleShoppingListCostLayout);
+        listCostEdittext= view.findViewById(R.id.singleShoppingListCostEdittext);
         productsRecycler= view.findViewById(R.id.product_list_recycler);
         closeShoppingListButton= view.findViewById(R.id.closeShoppingListButton);
         addNewProductButton= view.findViewById(R.id.add_new_product_button);
         listHeadline= view.findViewById(R.id.product_list_headline);
         searchProductsSpinner= view.findViewById(R.id.search_product_spinner);
+        closedShoppingListCostTextview= view.findViewById(R.id.closedShoppingListCostTextview);
         searchProductsSpinner.setAdapter(new ArrayAdapter<>(getActivity(),R.layout.products_spinner_dropdown_item,ShoppingListsFragment.getExistingProducts().keySet().toArray()));
         firebaseDatabase= FirebaseDatabase.getInstance();
         shoppingListRef=firebaseDatabase.getReference().child(ConstantValues.shoppingLists).child(shoppingList.getDate());
+        statisticsRef=firebaseDatabase.getReference().child(ConstantValues.statistics);
         productsRef = shoppingListRef.child("productList");
         listHeadline.setText(listHeadline.getText()+" - "+shoppingList.getDate());
         currentProductsList=new ArrayList<Product>();
         currentProductsNamesList=new ArrayList<String>();
+        listCostLayout.setVisibility(View.INVISIBLE);
+        closedShoppingListCostTextview.setVisibility(View.INVISIBLE);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setStackFromEnd(true);
         layoutManager.setReverseLayout(true);
@@ -124,6 +133,8 @@ public class SingleShoppingListFragment extends Fragment {
         if(shoppingList.getIsOpen().equals("true")){
             setListeners();
         } else{
+            closedShoppingListCostTextview.setVisibility(view.VISIBLE);
+            closedShoppingListCostTextview.setText("סכום הקניה:  "+ shoppingList.getCost()+ " שח");
             closeShoppingListButton.setText("הקניה סגורה");
             closeShoppingListButton.setClickable(false);
             searchProductsSpinner.setVisibility(View.INVISIBLE);
@@ -146,7 +157,17 @@ public class SingleShoppingListFragment extends Fragment {
                     navController.navigate(R.id.action_singleShoppingListFragment_to_addNewProductFragment);
                     break;
                 case R.id.closeShoppingListButton:
-                    createAlertDialog("האם אתה בטוח שאתה רוצה לסגור את הקניה ?", ConstantValues.closeShoppingListAction,null);
+                    if(listCostLayout.getVisibility()== getView().INVISIBLE){
+                        listCostLayout.setVisibility(getView().VISIBLE);
+                        Toast.makeText(getActivity(), "הכנס את סכום הקניה", Toast.LENGTH_SHORT).show();
+                    } else {
+                        costString = listCostEdittext.getText().toString();
+                        if (costString.equals("")) {
+                            Toast.makeText(getActivity(), "סכום הקניה שהוכנס אינו תקין", Toast.LENGTH_SHORT).show();
+                        } else {
+                            createAlertDialog("סכום הקניה שהוכנס: "+ costString +"\nהאם אתה בטוח שאתה רוצה לסגור את הקניה ?", ConstantValues.closeShoppingListAction, null);
+                        }
+                    }
                     break;
             }
 
@@ -257,6 +278,9 @@ public class SingleShoppingListFragment extends Fragment {
                                 break;
                             case ConstantValues.closeShoppingListAction:
                                 shoppingListRef.child(ConstantValues.isOpen).setValue("false");
+                                shoppingListRef.child(ConstantValues.listCost).setValue(costString);
+                                statisticsRef.child(shoppingList.getDate()).child(ConstantValues.listDate).setValue(shoppingList.getDate());
+                                statisticsRef.child(shoppingList.getDate()).child(ConstantValues.listCost).setValue(costString);
                                 navController.navigate(R.id.action_singleShoppingListFragment_to_shoppingListsFragment);
                                 Toast.makeText(getActivity(), "הקניה נסגה בהצלחה", Toast.LENGTH_SHORT).show();
                                 break;

@@ -8,4 +8,9 @@ public interface ConstantValues {
     public String isOpen="isOpen";
     public String removeProductAction="remove_product";
     public String closeShoppingListAction="close_shopping_list";
+    public String listCost="cost";
+    public String listDate="date";
+    public String statistics="STATISTICS";
+
+
 }
