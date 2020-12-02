@@ -6,13 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="10dp"
+    android:background="#eceff1"
     android:orientation="vertical"
     tools:context=".Ui.ShoppingListsFragment">
 
     <TextView
-        android:id="@+id/message"
+        android:id="@+id/shopping_lists_headline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/gloria_hallelujah"
         android:gravity="center"
         android:text="קניות"
         android:textSize="24dp" />

@@ -138,6 +138,7 @@ public class SingleShoppingListFragment extends Fragment {
             closeShoppingListButton.setText("הקניה סגורה");
             closeShoppingListButton.setClickable(false);
             searchProductsSpinner.setVisibility(View.INVISIBLE);
+            addNewProductButton.setVisibility(View.INVISIBLE);
         }
     }
 

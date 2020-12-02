@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="10dp"
+    android:background="#eceff1"
     android:orientation="vertical"
     tools:context=".Ui.SingleShoppingListFragment">
 
@@ -35,7 +36,7 @@
             android:id="@+id/add_new_product_button"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
+            android:background="#eceff1"
             android:src="@drawable/ic_add_new_product" />
 
         <com.toptoche.searchablespinnerlibrary.SearchableSpinner
@@ -49,7 +50,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/product_list_recycler"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent">
 
         </androidx.recyclerview.widget.RecyclerView>
 

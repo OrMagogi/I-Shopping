@@ -2,6 +2,7 @@ package com.example.ishopping.Ui;
 
 import androidx.lifecycle.ViewModelProviders;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -49,6 +50,7 @@ public class ShoppingListsFragment extends Fragment {
     private FirebaseDatabase firebaseDatabase;
     private static DatabaseReference productsRef,shoppingListsRef;
     private Product productFromDb;
+    private TextView shoppingListsHeadline;
     private ShoppingList shoppingListFromDb,newShoppingList;
     private static HashMap<String,String> existingProducts;
     private FirebaseRecyclerAdapter<ShoppingList, ShoppingListsFragment.ShoppingListsViewHolder> firebaseRecyclerAdapter;
@@ -77,6 +79,11 @@ public class ShoppingListsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+/*        Typeface tf = Typeface.createFromAsset(getActivity().getAssets(), "C:\\Users\\magog\\AndroidStudioProjects\\Ishopping\\app\\src\\main\\res\\font\\gveretlevinalefalefalefregular.otf");
+        shoppingListsHeadline=view.findViewById(R.id.shopping_lists_headline);
+        shoppingListsHeadline.setTypeface(tf);*/
+
         addNewListButton= view.findViewById(R.id.add_new_list_button);
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
         shoppingListsRecyclerView = view.findViewById(R.id.shopping_lists_recycler);

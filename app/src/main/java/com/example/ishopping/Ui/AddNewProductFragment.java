@@ -128,6 +128,7 @@ public class AddNewProductFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Toast.makeText(getActivity(), "המוצר נוסף בהצלחה", Toast.LENGTH_SHORT).show();
+                ShoppingListsFragment.getExistingProducts().put(newProductName,newProductCategoryName);
             }
         });
 
